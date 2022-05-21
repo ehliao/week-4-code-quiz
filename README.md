@@ -2,7 +2,7 @@
 
 
 Screenshot of website
-![alt text](screenshot1.JPG)
+![alt text](screenshot%201.JPG)
 ![alt text](screenshot2.JPG)
 
 [URL of GitHub Repository](https://github.com/ehliao/week-4-code-quiz)

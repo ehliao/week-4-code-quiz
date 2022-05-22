@@ -3,91 +3,7 @@ var nextButton = document.getElementById('next-btn')
 var questionContainerElement = document.getElementById('question-container')
 var questionElement = document.getElementById('question')
 var answerButtonsElement = document.getElementById('answer-buttons')
-
-let shuffledQuestions, currentQuestionIndex
-
-startButton.addEventListener('click', () => {
-  startGame()
-  timer()
-})
-nextButton.addEventListener('click', () => {
-  currentQuestionIndex++
-  setNextQuestion()
-})
-
-function startGame() {
-  startButton.classList.add('hide')
-  shuffledQuestions = questions.sort(() => Math.random() - .5)
-  currentQuestionIndex = 0
-  questionContainerElement.classList.remove('hide')
-  setNextQuestion()
-}
-
-function setNextQuestion() {
-  resetState()
-  showQuestion(shuffledQuestions[currentQuestionIndex])
-}
-
-function showQuestion(question) {
-  questionElement.innerText = question.question
-  question.answers.forEach(answer => {
-    var button = document.createElement('button')
-    button.innerText = answer.text
-    button.classList.add('btn')
-    if (answer.correct) {
-      button.dataset.correct = answer.correct
-    }
-    button.addEventListener('click', selectAnswer)
-    answerButtonsElement.appendChild(button)
-  })
-}
-
-function resetState() {
-  clearStatusClass(document.body)
-  nextButton.classList.add('hide')
-  while (answerButtonsElement.firstChild) {
-    answerButtonsElement.removeChild(answerButtonsElement.firstChild)
-  }
-}
-
-
-function selectAnswer(e) {
-  var selectedButton = e.target
-  var correct = selectedButton.dataset.correct
-  console.log(correct)
-  setStatusClass(document.body, correct)
-  Array.from(answerButtonsElement.children).forEach(button => {
-    setStatusClass(button, button.dataset.correct)
-  })
-  if (shuffledQuestions.length > currentQuestionIndex + 1) {
-    nextButton.classList.remove('hide')
-  } else {
-    startButton.innerText = 'Restart'
-    startButton.classList.remove('hide')
-  }
-}
-
-function setStatusClass(element, correct) {
-  clearStatusClass(element)
-  if (correct) {
-    element.classList.add('correct')
-  } else {
-    element.classList.add('wrong')
-    decrementTime()
-  }
-} 
-
-function decrementTime() {
-    var penaltyTime = 5;
-    document.getElementById('time-display').innerHTML=count-=penaltyTime;
-}
-
-function clearStatusClass(element) {
-  element.classList.remove('correct')
-  element.classList.remove('wrong')
-
-}
-
+var count = 30;
 var questions = [
   {
     question: 'What does HTML stand for?',
@@ -124,25 +40,96 @@ var questions = [
     ]
   }
 ]
+let shuffledQuestions, currentQuestionIndex
 
-var count = 60;
-var interval = setInterval(timer,1000);
+startButton.addEventListener('click', () => {
+  startGame()
+  startTimer()
+})
+nextButton.addEventListener('click', () => {
+  currentQuestionIndex++
+  setNextQuestion()
+})
 
-   // if (document.getElementById('wrong')) {
-  //   console.log('wrong')
-  //   document.getElementById('wrong').addEventListener('click', function() {
-  //     sec -= 5;
-  //     document.getElementById('time-display').innerHTML='00:'+sec;
-  //   });
-  // }
+function startTimer() {
+  var interval = setInterval(function() {
+    document.getElementById('time-display').innerHTML=count;
+    count--;
+    if (count < 0){
+      clearInterval(interval);
+      alert("You're out of time!");
+    }
+  },1000);
+}
 
-function timer() {
-  document.getElementById('time-display').innerHTML=count;
-  count--;
-  if (count === 0){
-    clearInterval(interval);
-    // document.getElementById('start-btn').innerHTML='Done';
-    // or...
-    alert("You're out of time!");
+function startGame() {
+  startButton.classList.add('hide')
+  questionContainerElement.classList.remove('hide')
+  shuffledQuestions = questions.sort(() => Math.random() - .5)
+  currentQuestionIndex = 0
+  setNextQuestion()
+}
+
+function setNextQuestion() {
+  resetState()
+  showQuestion(shuffledQuestions[currentQuestionIndex])
+}
+
+function showQuestion(question) {
+  questionElement.innerText = question.question
+  question.answers.forEach(answer => {
+    var button = document.createElement('button')
+    button.innerText = answer.text
+    button.classList.add('btn')
+    // If the answer obj has the property correct set to true,
+    // add true to the data-correct property
+    if (answer.correct) {
+      button.dataset.correct = answer.correct
+    }
+    button.addEventListener('click', selectAnswer)
+    answerButtonsElement.appendChild(button)
+  })
+}
+
+function resetState() {
+  clearStatusClass(document.body)
+  nextButton.classList.add('hide')
+  while (answerButtonsElement.firstChild) {
+    answerButtonsElement.removeChild(answerButtonsElement.firstChild)
   }
+}
+
+function selectAnswer(e) {
+  var selectedButton = e.target
+  var correct = selectedButton.dataset.correct
+  setStatusClass(document.body, correct)
+  Array.from(answerButtonsElement.children).forEach(button => {
+    setStatusClass(button, button.dataset.correct)
+  })
+  // If the selected answer does not have the value
+  // true in it's data-correct property, remove 5 seconds.
+  if(!correct){
+    count -= 5
+    document.getElementById('time-display').innerHTML=count;
+  }
+  if (shuffledQuestions.length > currentQuestionIndex + 1) {
+    nextButton.classList.remove('hide')
+  } else {
+    startButton.innerText = 'Restart'
+    startButton.classList.remove('hide')
+  }
+}
+
+function setStatusClass(element, correct) {
+  clearStatusClass(element)
+  if (correct) {
+    element.classList.add('correct')
+  } else {
+    element.classList.add('wrong')
+  }
+}
+
+function clearStatusClass(element) {
+  element.classList.remove('correct')
+  element.classList.remove('wrong')
 }
